@@ -10,10 +10,19 @@ class SimulacaoPacman:
         self.p_atual = self.definir_posicao_inicial()
         self.iteracao = 0
         self.p_anterior = None
+        self.num_inimigos = 3 # Quantidade de Inimigos
+        self.gerar_inimigos()
+        
 
     def definir_posicao_inicial(self):
         posicoes_disponiveis = [(i, j) for i in range(self.linhas) for j in range(self.colunas)]
         return random.choice(posicoes_disponiveis)
+    
+    def gerar_inimigos(self):
+        posicoes_disponiveis = [(i, j) for i in range(self.linhas) for j in range(self.colunas)]
+        posicoes_inimigos = random.sample(posicoes_disponiveis, self.num_inimigos)
+        for pos in posicoes_inimigos:
+            self.matrix[pos[0]][pos[1]] = '@'
 
     def mover(self):
         i, j = self.p_atual
@@ -38,6 +47,12 @@ class SimulacaoPacman:
             self.p_atual = i, j - 1
 
         self.iteracao += 1
+        
+    def colisao_inimigo(self):
+        i, j = self.p_atual
+        if self.matrix[i][j] == '@':
+            return True
+        return False
 
     def encontrar_comida_proxima(self):
         posicao_pacman = self.p_atual
@@ -74,6 +89,8 @@ class SimulacaoPacman:
             os.system('cls' if os.name == 'nt' else 'clear')  # Limpar o terminal após cada iteração - Requisito atendido
             self.restaurar_p_anterior()
             self.mover()
+            if self.colisao_inimigo(): # Colisão Ativada
+                break
             self.coletar_comida()
             self.exibir_matrix()
             time.sleep(0.6)  # Use “sleep(0.6)” para o computador aguardar por 60 ms - Requisito atendido
